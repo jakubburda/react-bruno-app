@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-frontend
+  namespace: mpaa
+  labels:
+    app: nginx-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-frontend
+  template:
+    metadata:
+      labels:
+        app: nginx-frontend
+    spec:
+      containers:
+      - name: nginx-frontend
+        image: registry.gitlab.com/bp-sojka/mppa/frontend:latest
+        ports:
+          - containerPort: 3000
+        env:
+          - name: DANGEROUSLY_DISABLE_HOST_CHECK
+            value: "true"
+          - name: REACT_APP_BASE_API_URL
+            value: "http://mpaa-reader.jcu.garrulus.cz/api/data"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-frontend-service
+  labels:
+    app: nginx-frontend
+spec:
+  selector:
+    app: nginx-frontend
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 3000
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-frontend-ingress
+spec:
+  ingressClassName: "traefik"
+  rules:
+  - host: mpaa-frontend.jcu.garrulus.cz
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nginx-frontend-service
+            port:
+              number: 80
