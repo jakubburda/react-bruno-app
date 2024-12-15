@@ -1,8 +1,29 @@
+import { useState, useEffect } from 'react';
+import { fetchDataFromApi } from './api/api';
+
+import SharedLayout from './components/SharedLayout';
+
 function App() {
+  const [data, setData] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+
+    const loadData = async () => {
+      try {
+        const result = await fetchDataFromApi();
+        setData(result);
+      } catch (error) {
+        setError(error);
+      }
+    };
+
+    loadData();
+  }, []);
+
+
   return (
-    <div>
-      <h1>Learn React</h1>
-    </div>
+    <SharedLayout data={data} error={error} />
   );
 }
 

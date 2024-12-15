@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-    baseURL: process.env.REACT_APP_BRUNO_API_URL,
+    baseURL: process.env.REACT_APP_BASE_API_URL,
     headers: {
         'Authorization' : `Bearer ${process.env.REACT_APP_BRUNO_API_KEY}`,
         'Content-Type': 'application/json',
@@ -19,7 +19,7 @@ const fetchDataFromApi = async () => {
           } else {
             console.error('Error fetching links:', error);
         }
-        throw Error;
+        throw new Error('Chyba při načítání dat z rozhraní API!');
     }
 };
 
